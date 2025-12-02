@@ -69,7 +69,33 @@ linecompleted(Board, Move) :-
 
     game_number(N),
     format("  game_number(after update)=~w~n", [N]),
-    N >= 4, !.                       % FIN
+    N >= 4, !.
+
+
+columncompleted(Board, Move) :-
+    retractall(game_number(_)),      % compteur à 0 au début
+    assert(game_number(0)),
+
+    nth0(Move, Board, Player),
+    format("[columncompleted] Move=~w Player=~w~n", [Move, Player]),
+
+    Column is mod(Move,7),
+    format("  Column(computed)=~w~n", [Column]),
+
+    between(0, 5, Row),
+
+    Cell is Row*7 + Column,
+    format("  -> Column=~w CellIndex=~w~n", [Column, Cell]),
+
+    nth0(Cell, Board, Val),
+    format("     CellVal=~w (vs Player=~w)~n", [Val, Player]),
+
+    ( Val == Player -> incr ; reset_counter ),
+
+    game_number(N),
+    format("  game_number(after update)=~w~n", [N]),
+    N >= 4, !.
+
 
 
 incr :-
