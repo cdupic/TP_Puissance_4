@@ -27,6 +27,14 @@ changePlayer('Y','X').
 
 
 ia(Board, Move, Player) :-
+    % play a winning move if there is one
+    between(0, 6, Column),
+    dropPiece(Board, Column, Move),
+    playMove(Board, Move, HypotheticalBoard, Player),
+    isWinningMove(HypotheticalBoard, Move)
+    ;
+
+    % default behaviour : play a random valid move
     repeat,
     Column is random(7), % choose random column
     dropPiece(Board, Column, Move).
@@ -38,8 +46,8 @@ dropPiece(Board, Column, Move) :-
     var(Val).
 
 playMove(Board,Move,NewBoard,Player) :-
-		copy_term(Board, NewBoard),
-    	nth0(Move, NewBoard,Player).
+	copy_term(Board, NewBoard),
+    nth0(Move, NewBoard,Player).
 
 
 applyIt(Board, NewBoard) :-
@@ -216,10 +224,10 @@ isWinningMove(Board, Move) :-
 
 play(Player):-  write('New turn for:'), writeln(Player),
     board(Board), % instanciate the board from the knowledge base
-    displayBoard(Board), % print it
     ia(Board, Move,Player), % ask the AI for a move, that is, an index for the Player
     playMove(Board,Move,NewBoard,Player), % Play the move and get the result in a new Board
 	applyIt(Board, NewBoard), % Remove the old board from the KB and store the new one
+    displayBoard(NewBoard), % print it
 	(   gameOver(NewBoard, Move) ->
         write("Game over !!\n"),
         displayBoard(NewBoard), !
