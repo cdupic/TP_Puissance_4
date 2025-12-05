@@ -5,7 +5,15 @@
 % 0-1-2-3-4-5-6
 % 7-8-9-10-11-12-13
 % 35-36-37-38-39-40-41
-displayBoard(Board) :- displayBoardLight(Board).
+
+%mode("heavy").
+%mode("light").
+mode("ascii").
+
+displayBoard(Board) :-
+    mode("heavy") -> displayBoardHeavy(Board) ;
+    mode("light") -> displayBoardLight(Board) ;
+    displayBoardAscii(Board).
 
 
 displayBoardHeavy(Board) :-
@@ -22,7 +30,15 @@ displayBoardLight(Board) :-
     ((X > 0, X < 41, (X+1) mod 7 =:= 0) -> writeln('│'), write('│ ') ; true ),
     X == 41, writeln('│'), writeln('└──────────────────────┘').
 
+displayBoardAscii(Board) :-
+    between(0, 41, X),
+    (X == 0 -> writeln('+----------------------+'), write('| ') ; true ),
+    nth0(X, Board, Player), playerSymbol(Player, Symbol), format("~w ", [Symbol]),
+    ((X > 0, X < 41, (X+1) mod 7 =:= 0) -> writeln('|'), write('| ') ; true ),
+    X == 41, writeln('|'), writeln('+----------------------+').
+
 playerSymbol(Player, Symbol):-
+    mode("ascii") -> (Player == 'X' -> Symbol = 'X ' ; Player == 'Y' -> Symbol = 'O ' ; Symbol = '. ') ;
     (Player == 'X' -> Symbol = '🟡' ; Player == 'Y' -> Symbol = '🔴' ; Symbol = '  ').
 
 changePlayer('X','Y').
