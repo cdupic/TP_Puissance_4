@@ -6,13 +6,9 @@
 % 7-8-9-10-11-12-13
 % 35-36-37-38-39-40-41
 
-%mode("heavy").
-%mode("light").
-mode("ascii").
-
 displayBoard(Board) :-
-    mode("heavy") -> displayBoardHeavy(Board) ;
-    mode("light") -> displayBoardLight(Board) ;
+    displayMode("heavy") -> displayBoardHeavy(Board) ;
+    displayMode("light") -> displayBoardLight(Board) ;
     displayBoardAscii(Board).
 
 
@@ -38,7 +34,7 @@ displayBoardAscii(Board) :-
     X == 41, writeln('|'), writeln('+----------------------+').
 
 playerSymbol(Player, Symbol):-
-    mode("ascii") -> (Player == 'X' -> Symbol = 'X ' ; Player == 'Y' -> Symbol = 'O ' ; Symbol = '. ') ;
+    displayMode("ascii") -> (Player == 'X' -> Symbol = 'X ' ; Player == 'Y' -> Symbol = 'O ' ; Symbol = '. ') ;
     (Player == 'X' -> Symbol = '🟡' ; Player == 'Y' -> Symbol = '🔴' ; Symbol = '  ').
 
 changePlayer('X','Y').
