@@ -210,6 +210,36 @@ gameOver(Board, Move) :- % else check if move is winning move
 
 
 
+max(X1,X2,Max) :-
+    X1 > X2 -> Max = X1;
+    Max = X2.
+
+min(X1,X2,Min) :-
+    X1 > X2 -> Max = X2;
+    Min = X1.
+
+minimax(Depth, NodeIndex, IsMax, Scores, H, OptimalValue) :-
+    %Terminating condition. i.e
+    % leaf node is reached
+    (Depth == H -> nth0(NodeIndex, Score, OptimalValue));
+
+    %  If current move is maximizer,
+    % find the maximum attainable
+    % value
+    NewDepth is Depth + 1, NewNodeIndex1 is NodeIndex*2, NewNodeIndex2 is NewNodeIndex1+1,
+    IsMax == 1 ->  OptimalValue = max(minimax(NewDepth , NewNodeIndex1, 0, Scores, H), minimax(NewDepth , NewNodeIndex2, 0, Scores, H));
+        % Else (If current move is Minimizer), find the minimum
+        % attainable value
+    OptimalValue = min(minimax(NewDepth , NewNodeIndex1, 0, Scores, H), minimax(NewDepth , NewNodeIndex2, 0, Scores, H)).
+
+
+logBase2(1,0).
+logBase2(N,R) :-
+                N>1,
+                N1 is N//2,
+                logBase2(N1,R1),
+                R is R1 +1.
+
 play(Player):-  write('New turn for:'), writeln(Player),
     		board(Board), % instanciate the board from the knowledge base
        	    displayBoard(Board), % print it
