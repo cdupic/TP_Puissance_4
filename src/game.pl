@@ -226,11 +226,11 @@ minimax(Depth, NodeIndex, IsMax, Scores, H, OptimalValue) :-
     %  If current move is maximizer,
     % find the maximum attainable
     % value
-    NewDepth is Depth + 1, NewNodeIndex1 is NodeIndex*2, NewNodeIndex2 is NewNodeIndex1+1,
+    (NewDepth is Depth + 1, NewNodeIndex1 is NodeIndex*2, NewNodeIndex2 is NewNodeIndex1+1,
     IsMax == 1 ->  OptimalValue = max(minimax(NewDepth , NewNodeIndex1, 0, Scores, H), minimax(NewDepth , NewNodeIndex2, 0, Scores, H));
         % Else (If current move is Minimizer), find the minimum
         % attainable value
-    OptimalValue = min(minimax(NewDepth , NewNodeIndex1, 0, Scores, H), minimax(NewDepth , NewNodeIndex2, 0, Scores, H)).
+    OptimalValue = min(minimax(NewDepth , NewNodeIndex1, 1, Scores, H), minimax(NewDepth , NewNodeIndex2, 1, Scores, H))).
 
 
 logBase2(1,0).
