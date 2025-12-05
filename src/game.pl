@@ -208,21 +208,25 @@ gameOver(Board, Move) :- % else check if move is winning move
     % check if a diagonal has been completed
     (diagonalcompleted(Board, Move) -> format("diagonal completed at move~w~n", [Move])) .
 
+isWinningMove(Board, Move) :-
+    linecompleted(Board, Move);
+    columncompleted(Board, Move);
+    diagonalcompleted(Board, Move).
 
 
 play(Player):-  write('New turn for:'), writeln(Player),
-    		board(Board), % instanciate the board from the knowledge base
-       	    displayBoard(Board), % print it
-            ia(Board, Move,Player), % ask the AI for a move, that is, an index for the Player
-    	    playMove(Board,Move,NewBoard,Player), % Play the move and get the result in a new Board
-		    applyIt(Board, NewBoard), % Remove the old board from the KB and store the new one
-		    ( gameOver(NewBoard, Move) ->
-                    write("Game over !!\n"),
-                    displayBoard(NewBoard), !
-                ;
-                    changePlayer(Player, NextPlayer),
-                    play(NextPlayer)
-            ).
+    board(Board), % instanciate the board from the knowledge base
+    displayBoard(Board), % print it
+    ia(Board, Move,Player), % ask the AI for a move, that is, an index for the Player
+    playMove(Board,Move,NewBoard,Player), % Play the move and get the result in a new Board
+	applyIt(Board, NewBoard), % Remove the old board from the KB and store the new one
+	(   gameOver(NewBoard, Move) ->
+        write("Game over !!\n"),
+        displayBoard(NewBoard), !
+        ;
+        changePlayer(Player, NextPlayer),
+        play(NextPlayer)
+    ).
 
 init :-
     length(Board, 42),
