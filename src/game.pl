@@ -18,9 +18,9 @@ checkline(X) :-
 writeElem(X, Board) :-
     nth0(X, Board, Z),
     % if Z == 'X' then print " X ", else if Z == 'Y' then print " Y ", else print " . "
-    (Z == 'X' -> format(" X ");
-    Z == 'Y' -> format(" Y ");
-    format(" . ")).
+    (Z == 'X' -> format("🟡");
+    Z == 'Y' -> format("🔴");
+    format("..")).
 
 changePlayer('X','Y').
 changePlayer('Y','X').
