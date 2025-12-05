@@ -5,26 +5,40 @@
 % 0-1-2-3-4-5-6
 % 7-8-9-10-11-12-13
 % 35-36-37-38-39-40-41
+
 displayBoard(Board) :-
+    displayMode("heavy") -> displayBoardHeavy(Board) ;
+    displayMode("light") -> displayBoardLight(Board) ;
+    displayBoardAscii(Board).
+
+
+displayBoardHeavy(Board) :-
     between(0, 41, X),
-    writeElem(X, Board),
-    checkline(X),
-    X == 41.
+    (X == 0 -> writeln('┌────┬────┬────┬────┬────┬────┬────┐') ; true ),
+    nth0(X, Board, Player), playerSymbol(Player, Symbol), format("│ ~w ", [Symbol]),
+    ((X > 0, X < 41, (X+1) mod 7 =:= 0) -> writeln('│'), writeln('├────┼────┼────┼────┼────┼────┼────┤') ; true ),
+    X == 41, writeln('│'), writeln('└────┴────┴────┴────┴────┴────┴────┘').
 
-checkline(X) :-
-    ( X == 6 ; X == 13 ; X == 20 ; X == 27 ; X == 34 ; X == 41 ),
-    writeln('').
+displayBoardLight(Board) :-
+    between(0, 41, X),
+    (X == 0 -> writeln('┌──────────────────────┐'), write('│ ') ; true ),
+    nth0(X, Board, Player), playerSymbol(Player, Symbol), format("~w ", [Symbol]),
+    ((X > 0, X < 41, (X+1) mod 7 =:= 0) -> writeln('│'), write('│ ') ; true ),
+    X == 41, writeln('│'), writeln('└──────────────────────┘').
 
-writeElem(X, Board) :-
-    nth0(X, Board, Z),
-    % if Z == 'X' then print " X ", else if Z == 'Y' then print " Y ", else print " . "
-    (Z == 'X' -> format("🟡");
-    Z == 'Y' -> format("🔴");
-    format("..")).
+displayBoardAscii(Board) :-
+    between(0, 41, X),
+    (X == 0 -> writeln('+----------------------+'), write('| ') ; true ),
+    nth0(X, Board, Player), playerSymbol(Player, Symbol), format("~w ", [Symbol]),
+    ((X > 0, X < 41, (X+1) mod 7 =:= 0) -> writeln('|'), write('| ') ; true ),
+    X == 41, writeln('|'), writeln('+----------------------+').
+
+playerSymbol(Player, Symbol):-
+    displayMode("ascii") -> (Player == 'X' -> Symbol = 'X ' ; Player == 'Y' -> Symbol = 'O ' ; Symbol = '. ') ;
+    (Player == 'X' -> Symbol = '🟡' ; Player == 'Y' -> Symbol = '🔴' ; Symbol = '  ').
 
 changePlayer('X','Y').
 changePlayer('Y','X').
-
 
 dropPiece(Board, Column, Move) :-
     between(0, 6, Row),
@@ -36,7 +50,6 @@ dropPiece(Board, Column, Move) :-
 playMove(Board,Move,NewBoard,Player) :-
 	copy_term(Board, NewBoard),
     nth0(Move, NewBoard,Player).
-
 
 applyIt(Board, NewBoard) :-
     retract(board(Board)), % on oublie l'ancienne règle qui n'est plus vraie
@@ -213,8 +226,9 @@ isWinningMove(Board, Move) :-
     diagonalcompleted(Board, Move).
 
 
-play(Player):-  write('New turn for:'), writeln(Player),
+play(Player):- 
     board(Board), % instanciate the board from the knowledge base
+    playerSymbol(Player, Symbol), write('New turn for: '), writeln(Symbol),
 
     % select the correct predicate (given in flags) to call for the current player
     (
@@ -230,14 +244,14 @@ play(Player):-  write('New turn for:'), writeln(Player),
     playMove(Board,Move,NewBoard,Player), % Play the move and get the result in a new Board
 	applyIt(Board, NewBoard), % Remove the old board from the KB and store the new one
     displayBoard(NewBoard), % print it
-	(   gameOver(NewBoard, Move) ->
-        write("Game over !!\n"),
-        displayBoard(NewBoard), !
-        ;
-        changePlayer(Player, NextPlayer),
-        play(NextPlayer)
-    ).
-
+	( gameOver(NewBoard, Move, Details) ->
+                    displayBoard(NewBoard),
+                    format("Game over ! (~w)\n", [Details]), !
+                ;
+                    changePlayer(Player, NextPlayer),
+                    play(NextPlayer)
+            ).
+            
 init :-
     length(Board, 42),
     assert(board(Board)),
