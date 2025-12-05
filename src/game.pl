@@ -250,8 +250,6 @@ init :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-:-multifile basicAi/3.
-
 basicAi(Board, Move, Player) :-
     % play a winning move if there is one
     between(0, 6, Column),
