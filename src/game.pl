@@ -46,7 +46,11 @@ ia(Board, Move, Player) :-
     !
     ;
 
-    
+    % find a move that does not enable a direct win for the opponent
+    repeat,
+    Column is random(7), % choose random column
+    dropPiece(Board, Column, Move),
+
 
     % default behaviour : play a random valid move
     repeat,
@@ -217,20 +221,26 @@ reset_counter :-
     retract(game_number(_)),
     assert(game_number(0)).
 
+    
 
-%gameOver(Board, Move) :-   % first check if board is full
-%    write("Draw\n"),
-%    between(0, 41, X),
-%    nth0(X, Board, Val),
-%    nonvar(Val).
+gameOver(Board, Move) :- 
 
-gameOver(Board, Move) :- % else check if move is winning move
     % check if a line as been completed
-    ( linecompleted(Board, Move) -> format("line completed at move~w~n", [Move]) ;
+    linecompleted(Board, Move) -> format("line completed at move~w~n", [Move]) 
+    ;
     % check if a column has been completed
-    columncompleted(Board, Move) -> format("column completed at move~w~n", [Move]));
+    columncompleted(Board, Move) -> format("column completed at move~w~n", [Move])
+    ;
     % check if a diagonal has been completed
-    (diagonalcompleted(Board, Move) -> format("diagonal completed at move~w~n", [Move])) .
+    diagonalcompleted(Board, Move) -> format("diagonal completed at move~w~n", [Move])
+    ;
+
+    % else check whether board is full
+    \+ (between(0, 41, X),
+        nth0(X, Board, Val),
+        var(Val)) -> write("Draw\n").
+
+
 
 isWinningMove(Board, Move) :-
     linecompleted(Board, Move);
