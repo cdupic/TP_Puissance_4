@@ -1,4 +1,4 @@
-ia(Board, Move, Player) :- % TODO: code the IA
+minmaxIa(Board, Move, Player) :- % TODO: code the IA
     repeat,
     Column is random(7), % choose random column
     dropPiece(Board, Column, Move).

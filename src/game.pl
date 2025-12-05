@@ -56,170 +56,6 @@ applyIt(Board, NewBoard) :-
     assert(board(NewBoard)).
 
 
-linecompleted(Board, Move) :-
-    retractall(game_number(_)),      % compteur à 0 au début
-    assert(game_number(0)),
-
-    nth0(Move, Board, Player),
-    %format("[linecompleted] Move=~w Player=~w~n", [Move, Player]),
-
-    Row is Move // 7,
-    %format("  Row(computed)=~w~n", [Row]),
-
-    between(0, 6, Column),
-
-    Cell is Row*7 + Column,
-    %format("  -> Column=~w CellIndex=~w~n", [Column, Cell]),
-
-    nth0(Cell, Board, Val),
-    %format("     CellVal=~w (vs Player=~w)~n", [Val, Player]),
-
-    ( Val == Player -> incr ; reset_counter ),
-
-    game_number(N),
-    %format("  game_number(after update)=~w~n", [N]),
-    N >= 4, !.
-
-
-columncompleted(Board, Move) :-
-    retractall(game_number(_)),      % compteur à 0 au début
-    assert(game_number(0)),
-
-    nth0(Move, Board, Player),
-    %format("[columncompleted] Move=~w Player=~w~n", [Move, Player]),
-
-    Column is mod(Move,7),
-    %format("  Column(computed)=~w~n", [Column]),
-
-    between(0, 5, Row),
-
-    Cell is Row*7 + Column,
-    %format("  -> Column=~w CellIndex=~w~n", [Column, Cell]),
-
-    nth0(Cell, Board, Val),
-    %format("     CellVal=~w (vs Player=~w)~n", [Val, Player]),
-
-    ( Val == Player -> incr ; reset_counter ),
-
-    game_number(N),
-    %format("  game_number(after update)=~w~n", [N]),
-    N >= 4, !.
-
-getTopRight(Move, TopRight) :-
-    %MoveCol is Move mod 7,
-    between(0, 5, R),
-    TopRight is Move - 6*R,
-    TopRightCol is TopRight mod 7,
-    (TopRightCol == 6;  % si on arrive à la dernière colonne, exit
-    TopRight < 7),  % ou on est sur la première ligne
-    !.
-
-
-getTopLeft(Move, TopLeft) :-
-    %MoveCol is Move mod 7,
-    between(0, 5, R),
-    TopLeft is Move - 8*R,
-    TopLeftCol is TopLeft mod 7,
-    (TopLeftCol == 0 ; % si on arrive à la dernière colonne, exit
-    TopLeft < 7 ), % si on est sur la première ligne, exit
-    !.
-
-
-topLeftDiagonal(Board, Move) :-
-    retractall(game_number(_)),
-    assert(game_number(0)),
-
-    nth0(Move, Board, Player),
-    %format("[topLeftDiagonal] Move=~w Player=~w~n", [Move, Player]),
-
-    % on récupère la case le plus en haut à gauche de cette diagonale puis traverse jusqu'à la case le plus en bas à droite
-    getTopLeft(Move, TopLeft),
-
-    between(0, 5, Row),
-
-    Cell is TopLeft + 8*Row,
-    Cell =< 41,
-    MoveCol is Cell mod 7,
-    %format(" CellIndex=~w~n", [Cell]),
-
-    nth0(Cell, Board, Val),
-    %format("     CellVal=~w (vs Player=~w)~n", [Val, Player]),
-    ( Val == Player -> incr ; reset_counter ),
-    game_number(N),
-    %format("game_number(after update)=~w~n", [N]),
-    (  N >= 4 -> !, true
-    ;  MoveCol == 6 -> !, false
-    ),
-         !.
-
-
-topRightDiagonal(Board, Move) :-
-    retractall(game_number(_)),
-    assert(game_number(0)),
-
-    nth0(Move, Board, Player),
-    %format("[topRightDiagonal] Move=~w Player=~w~n", [Move, Player]),
-
-    % on récupère la case le plus en haut à gauche de cette diagonale puis traverse jusqu'à la case le plus en bas à droite
-    getTopRight(Move, TopRight),
-
-    between(0, 5, Row),
-
-    Cell is TopRight + 6*Row,
-    Cell =< 41,
-    MoveCol is Cell mod 7,
-
-    %format(" CellIndex=~w~n", [Cell]),
-
-    nth0(Cell, Board, Val),
-    %format("     CellVal=~w (vs Player=~w)~n", [Val, Player]),
-
-    ( Val == Player -> incr ; reset_counter ),
-
-    game_number(N),
-    %format("game_number(after update)=~w~n", [N]),
-    (  N >= 4 -> !, true
-        ;  MoveCol == 0 -> !, false
-        ),
-    !.
-
-diagonalcompleted(Board, Move) :-
-    topLeftDiagonal(Board, Move);
-    topRightDiagonal(Board, Move).
-
-
-
-incr :-
-    retract(game_number(N)),
-    N1 is N + 1,
-    assert(game_number(N1)).
-
-
-reset_counter :-
-    retract(game_number(_)),
-    assert(game_number(0)).
-
-    
-
-gameOver(Board, Move) :- 
-
-    % check if a line as been completed
-    linecompleted(Board, Move) -> format("line completed at move~w~n", [Move]) 
-    ;
-    % check if a column has been completed
-    columncompleted(Board, Move) -> format("column completed at move~w~n", [Move])
-    ;
-    % check if a diagonal has been completed
-    diagonalcompleted(Board, Move) -> format("diagonal completed at move~w~n", [Move])
-    ;
-
-    % else check whether board is full
-    \+ (between(0, 41, X),
-        nth0(X, Board, Val),
-        var(Val)) -> write("Draw\n").
-
-
-
 isWinningMove(Board, Move) :-
     linecompleted(Board, Move);
     columncompleted(Board, Move);
@@ -237,7 +73,9 @@ play(Player):-
     ),
 
     (
-        AiType == 'basic-ai' -> basicAi(Board, Move, Player);
+        AiType == 'basic' -> basicAi(Board, Move, Player);
+        AiType == 'minmax' -> minmaxIa(Board, Move, Player);
+        AiType == 'random' -> randomIa(Board, Move, Player);
         writeln("Incorrect AI type"), fail
     ),
 
@@ -251,7 +89,7 @@ play(Player):-
                     changePlayer(Player, NextPlayer),
                     play(NextPlayer)
             ).
-            
+
 init :-
     length(Board, 42),
     assert(board(Board)),
@@ -262,51 +100,4 @@ init :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%% IA %%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-basicAi(Board, Move, Player) :-
-    % play a winning move if there is one
-    between(0, 6, Column),
-        dropPiece(Board, Column, M),
-        playMove(Board, M, HypotheticalBoard, Player),
-        isWinningMove(HypotheticalBoard, M),
-        Move = M,
-    !
-    ;
-
-    % block a potential opponent winning move
-    changePlayer(Player, Opponent),
-    between(0, 6, Column),
-        dropPiece(Board, Column, M),
-        playMove(Board, M, HypotheticalBoard, Opponent),
-        isWinningMove(HypotheticalBoard, M),
-        Move = M,
-    !
-    ;
-
-    % find a move that does not enable a direct win for the opponent
-    % use a random permutation, as to not always play the same move
-    random_permutation([0,1,2,3,4,5,6], MoveOrder),
-    changePlayer(Player, Opponent),
-    between(0, 6, N),
-        nth0(N, MoveOrder, Column),
-        dropPiece(Board, Column, M),
-        playMove(Board, M, HypotheticalBoard, Player),
-
-        % check that the move in this column does not allow the opponent to win (by playing in the same column)
-        dropPiece(HypotheticalBoard, Column, OpponentM),
-        playMove(HypotheticalBoard, OpponentM, HypotheticalBoard2, Opponent),
-        \+ isWinningMove(HypotheticalBoard2, OpponentM),
-        Move = M,
-    !
-    ;
-
-    % default behaviour : play a random valid move
-    repeat,
-    Column is random(7), % choose random column
-    dropPiece(Board, Column, Move),
-    !.
-
-
-
 
