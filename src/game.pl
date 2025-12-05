@@ -47,10 +47,21 @@ ia(Board, Move, Player) :-
     ;
 
     % find a move that does not enable a direct win for the opponent
-    repeat,
-    Column is random(7), % choose random column
-    dropPiece(Board, Column, Move),
+    % use a random permutation, as to not always play the same move
+    random_permutation([0,1,2,3,4,5,6], MoveOrder),
+    changePlayer(Player, Opponent),
+    between(0, 6, N),
+        nth0(N, MoveOrder, Column),
+        dropPiece(Board, Column, M),
+        playMove(Board, M, HypotheticalBoard, Player),
 
+        % check that the move in this column does not allow the opponent to win (by playing in the same column)
+        dropPiece(HypotheticalBoard, Column, OpponentM),
+        playMove(HypotheticalBoard, OpponentM, HypotheticalBoard2, Opponent),
+        \+ isWinningMove(HypotheticalBoard2, OpponentM),
+        Move = M,
+    !
+    ;
 
     % default behaviour : play a random valid move
     repeat,
