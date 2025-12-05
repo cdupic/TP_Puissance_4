@@ -29,21 +29,37 @@ changePlayer('Y','X').
 ia(Board, Move, Player) :-
     % play a winning move if there is one
     between(0, 6, Column),
-    dropPiece(Board, Column, Move),
-    playMove(Board, Move, HypotheticalBoard, Player),
-    isWinningMove(HypotheticalBoard, Move)
+        dropPiece(Board, Column, M),
+        playMove(Board, M, HypotheticalBoard, Player),
+        isWinningMove(HypotheticalBoard, M),
+        Move = M,
+    !
     ;
+
+    % block a potential opponent winning move
+    changePlayer(Player, Opponent),
+    between(0, 6, Column),
+        dropPiece(Board, Column, M),
+        playMove(Board, M, HypotheticalBoard, Opponent),
+        isWinningMove(HypotheticalBoard, M),
+        Move = M,
+    !
+    ;
+
+    
 
     % default behaviour : play a random valid move
     repeat,
     Column is random(7), % choose random column
-    dropPiece(Board, Column, Move).
+    dropPiece(Board, Column, Move),
+    !.
 
 dropPiece(Board, Column, Move) :-
     between(0, 6, Row),
-    Move is 35 + Column - 7*Row,
-    nth0(Move, Board, Val),
-    var(Val).
+        Move is 35 + Column - 7*Row,
+        nth0(Move, Board, Val),
+        var(Val),
+    !.
 
 playMove(Board,Move,NewBoard,Player) :-
 	copy_term(Board, NewBoard),
