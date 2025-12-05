@@ -26,49 +26,6 @@ changePlayer('X','Y').
 changePlayer('Y','X').
 
 
-ia(Board, Move, Player) :-
-    % play a winning move if there is one
-    between(0, 6, Column),
-        dropPiece(Board, Column, M),
-        playMove(Board, M, HypotheticalBoard, Player),
-        isWinningMove(HypotheticalBoard, M),
-        Move = M,
-    !
-    ;
-
-    % block a potential opponent winning move
-    changePlayer(Player, Opponent),
-    between(0, 6, Column),
-        dropPiece(Board, Column, M),
-        playMove(Board, M, HypotheticalBoard, Opponent),
-        isWinningMove(HypotheticalBoard, M),
-        Move = M,
-    !
-    ;
-
-    % find a move that does not enable a direct win for the opponent
-    % use a random permutation, as to not always play the same move
-    random_permutation([0,1,2,3,4,5,6], MoveOrder),
-    changePlayer(Player, Opponent),
-    between(0, 6, N),
-        nth0(N, MoveOrder, Column),
-        dropPiece(Board, Column, M),
-        playMove(Board, M, HypotheticalBoard, Player),
-
-        % check that the move in this column does not allow the opponent to win (by playing in the same column)
-        dropPiece(HypotheticalBoard, Column, OpponentM),
-        playMove(HypotheticalBoard, OpponentM, HypotheticalBoard2, Opponent),
-        \+ isWinningMove(HypotheticalBoard2, OpponentM),
-        Move = M,
-    !
-    ;
-
-    % default behaviour : play a random valid move
-    repeat,
-    Column is random(7), % choose random column
-    dropPiece(Board, Column, Move),
-    !.
-
 dropPiece(Board, Column, Move) :-
     between(0, 6, Row),
         Move is 35 + Column - 7*Row,
@@ -136,7 +93,7 @@ columncompleted(Board, Move) :-
     N >= 4, !.
 
 getTopRight(Move, TopRight) :-
-    MoveCol is Move mod 7,
+    %MoveCol is Move mod 7,
     between(0, 5, R),
     TopRight is Move - 6*R,
     TopRightCol is TopRight mod 7,
@@ -146,7 +103,7 @@ getTopRight(Move, TopRight) :-
 
 
 getTopLeft(Move, TopLeft) :-
-    MoveCol is Move mod 7,
+    %MoveCol is Move mod 7,
     between(0, 5, R),
     TopLeft is Move - 8*R,
     TopLeftCol is TopLeft mod 7,
@@ -219,9 +176,6 @@ diagonalcompleted(Board, Move) :-
 
 
 
-
-
-
 incr :-
     retract(game_number(N)),
     N1 is N + 1,
@@ -261,7 +215,18 @@ isWinningMove(Board, Move) :-
 
 play(Player):-  write('New turn for:'), writeln(Player),
     board(Board), % instanciate the board from the knowledge base
-    ia(Board, Move,Player), % ask the AI for a move, that is, an index for the Player
+
+    % select the correct predicate (given in flags) to call for the current player
+    (
+        Player == 'X' -> getenv("p1", AiType);
+        Player == 'Y' -> getenv("p2", AiType)
+    ),
+
+    (
+        AiType == 'basic-ai' -> basicAi(Board, Move, Player);
+        writeln("Incorrect AI type"), fail
+    ),
+
     playMove(Board,Move,NewBoard,Player), % Play the move and get the result in a new Board
 	applyIt(Board, NewBoard), % Remove the old board from the KB and store the new one
     displayBoard(NewBoard), % print it
@@ -277,3 +242,59 @@ init :-
     length(Board, 42),
     assert(board(Board)),
     play('X').
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%% IA %%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+:-multifile basicAi/3.
+
+basicAi(Board, Move, Player) :-
+    % play a winning move if there is one
+    between(0, 6, Column),
+        dropPiece(Board, Column, M),
+        playMove(Board, M, HypotheticalBoard, Player),
+        isWinningMove(HypotheticalBoard, M),
+        Move = M,
+    !
+    ;
+
+    % block a potential opponent winning move
+    changePlayer(Player, Opponent),
+    between(0, 6, Column),
+        dropPiece(Board, Column, M),
+        playMove(Board, M, HypotheticalBoard, Opponent),
+        isWinningMove(HypotheticalBoard, M),
+        Move = M,
+    !
+    ;
+
+    % find a move that does not enable a direct win for the opponent
+    % use a random permutation, as to not always play the same move
+    random_permutation([0,1,2,3,4,5,6], MoveOrder),
+    changePlayer(Player, Opponent),
+    between(0, 6, N),
+        nth0(N, MoveOrder, Column),
+        dropPiece(Board, Column, M),
+        playMove(Board, M, HypotheticalBoard, Player),
+
+        % check that the move in this column does not allow the opponent to win (by playing in the same column)
+        dropPiece(HypotheticalBoard, Column, OpponentM),
+        playMove(HypotheticalBoard, OpponentM, HypotheticalBoard2, Opponent),
+        \+ isWinningMove(HypotheticalBoard2, OpponentM),
+        Move = M,
+    !
+    ;
+
+    % default behaviour : play a random valid move
+    repeat,
+    Column is random(7), % choose random column
+    dropPiece(Board, Column, Move),
+    !.
+
+
+
+
