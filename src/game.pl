@@ -202,11 +202,11 @@ reset_counter :-
 
 gameOver(Board, Move) :- % else check if move is winning move
     % check if a line as been completed
-    ( linecompleted(Board, Move) -> format("line completed for move~w~n", [Move]) ;
+    ( linecompleted(Board, Move) -> format("line completed at move~w~n", [Move]) ;
     % check if a column has been completed
-    columncompleted(Board, Move) -> format("column completed for move~w~n", [Move]));
+    columncompleted(Board, Move) -> format("column completed at move~w~n", [Move]));
     % check if a diagonal has been completed
-    (diagonalcompleted(Board, Move) -> format("diagonal completed for move~w~n", [Move])) .
+    (diagonalcompleted(Board, Move) -> format("diagonal completed at move~w~n", [Move])) .
 
 
 
