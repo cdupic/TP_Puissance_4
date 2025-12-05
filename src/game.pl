@@ -218,19 +218,24 @@ min(X1,X2,Min) :-
     X1 > X2 -> Max = X2;
     Min = X1.
 
-minimax(Depth, NodeIndex, IsMax, Scores, H, OptimalValue) :-
-    %Terminating condition. i.e
-    % leaf node is reached
-    (Depth == H -> nth0(NodeIndex, Score, OptimalValue));
+minimax(Depth, NodeIndex, _IsMax, Scores, H, OptimalValue) :-
+    Depth =:= H,
+    nth0(NodeIndex, Scores, OptimalValue), !.
 
-    %  If current move is maximizer,
-    % find the maximum attainable
-    % value
-    (NewDepth is Depth + 1, NewNodeIndex1 is NodeIndex*2, NewNodeIndex2 is NewNodeIndex1+1,
-    IsMax == 1 ->  OptimalValue = max(minimax(NewDepth , NewNodeIndex1, 0, Scores, H), minimax(NewDepth , NewNodeIndex2, 0, Scores, H));
-        % Else (If current move is Minimizer), find the minimum
-        % attainable value
-    OptimalValue = min(minimax(NewDepth , NewNodeIndex1, 1, Scores, H), minimax(NewDepth , NewNodeIndex2, 1, Scores, H))).
+minimax(Depth, NodeIndex, IsMax, Scores, H, OptimalValue) :-
+    NewDepth is Depth + 1,
+    NewNodeIndex1 is NodeIndex * 2,
+    NewNodeIndex2 is NewNodeIndex1 + 1,
+    ( IsMax =:= 1 ->
+        minimax(NewDepth, NewNodeIndex1, 0, Scores, H, N1),
+        minimax(NewDepth, NewNodeIndex2, 0, Scores, H, N2),
+        max(N1, N2, OptimalValue)
+    ;
+        minimax(NewDepth, NewNodeIndex1, 1, Scores, H, N1),
+        minimax(NewDepth, NewNodeIndex2, 1, Scores, H, N2),
+        min(N1, N2, OptimalValue)
+    ).
+
 
 
 logBase2(1,0).
