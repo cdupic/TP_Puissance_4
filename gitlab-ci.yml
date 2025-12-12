@@ -1,0 +1,17 @@
+build-job:
+  stage: build
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+  script:
+    - docker build --pull -t "$CI_REGISTRY_IMAGE/aliapr-prolog:latest" ./
+    - docker push "$CI_REGISTRY_IMAGE/aliapr-prolog:latest"
+  services:
+    - docker:dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_DRIVER: overlay2
+
+test-job1:
+  stage: test
+  script:
+    - echo "This job tests something"
