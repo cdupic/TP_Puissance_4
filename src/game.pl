@@ -76,6 +76,7 @@ play(Player):-
         AiType == 'basic' -> basicAi(Board, Move, Player);
         AiType == 'minmax' -> minmaxIa(Board, Move, Player);
         AiType == 'random' -> randomIa(Board, Move, Player);
+        AiType == 'user' -> userAi(Board, Move, Player);
         writeln("Incorrect AI type"), fail
     ),
 

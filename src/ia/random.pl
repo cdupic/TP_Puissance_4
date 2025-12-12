@@ -1,4 +1,4 @@
-randomIa(Board, Move, Player) :-
+randomIa(Board, Move, _) :-
     repeat,
     Column is random(7), % choose random column
     dropPiece(Board, Column, Move).
