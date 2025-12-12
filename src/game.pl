@@ -62,7 +62,7 @@ isWinningMove(Board, Move) :-
     diagonalcompleted(Board, Move).
 
 
-play(Player):- 
+play(Player):-
     board(Board), % instanciate the board from the knowledge base
     playerSymbol(Player, Symbol), write('New turn for: '), writeln(Symbol),
 

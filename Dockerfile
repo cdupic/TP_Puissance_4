@@ -3,7 +3,8 @@ FROM swipl:9.3.35
 WORKDIR /app
 
 COPY ./src src/
-COPY ./start.sh ./
+COPY ./Makefile ./
 
-RUN chmod +x start.sh
-CMD ["/app/start.sh"]
+RUN apt-get update && apt-get install -y make && rm -rf /var/lib/apt/lists/*
+
+CMD ["make"]

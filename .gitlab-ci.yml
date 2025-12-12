@@ -47,7 +47,7 @@ test-prolog:
   before_script:
     - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY -u "$CI_REGISTRY_USER" --password-stdin
   script:
-    - docker pull "$CI_REGISTRY_IMAGE/aliapr-prolog:latest"
-    - docker run --rm "$CI_REGISTRY_IMAGE/aliapr-prolog:latest"
+    - docker build --pull -t "$CI_REGISTRY_IMAGE/aliapr-prolog:latest" ./
+    - docker run "$CI_REGISTRY_IMAGE/aliapr-prolog:latest" make test
   services:
     - docker:dind
