@@ -1,38 +1,13 @@
 image: docker:latest
 
-include:
-  - template: Jobs/SAST.gitlab-ci.yml
-  - template: Jobs/Container-Scanning.gitlab-ci.yml
-
 stages:
   - build
   - test
-
-sast:
-  rules: # Run the job only on any commit
-    - if: '$CI_COMMIT_BRANCH'
-      when: always
-    - when: never
-  services:
-    - docker:dind
-
-container_scanning:
-  rules: # Run the job only on any commit
-    - if: '$CI_COMMIT_BRANCH'
-      when: always
-    - when: never
-  services:
-    - docker:dind
-
 
 variables:
   DOCKER_HOST: tcp://docker:2375
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: ""
-
-default:
-  before_script:
-    - docker info
 
 build-prolog:
   stage: build
