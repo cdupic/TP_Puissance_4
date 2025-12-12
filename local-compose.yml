@@ -1,0 +1,25 @@
+# Use this file to run the app in docker in dev mode
+
+services:
+  aliapr-prolog:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: aliapr-prolog
+    volumes:
+      - ./src:/app/src
+    command: sleep 99999999
+
+  aliapr-server:
+    build:
+      context: .
+      dockerfile: server.Dockerfile
+    container_name: aliapr-server
+    volumes:
+      - ./server:/app/server
+      - ./src:/app/src
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - NODE_ENV=development
