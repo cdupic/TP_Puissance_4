@@ -77,12 +77,13 @@ play(Player):-
         AiType == 'minmax' -> minmaxIa(Board, Move, Player);
         AiType == 'random' -> randomIa(Board, Move, Player);
         AiType == 'user' -> userAi(Board, Move, Player);
+        AiType == 'neural-network-sigmoid' -> neuralNetworkAiSigmoid(Board, Move, Player);
+        AiType == 'neural-network-ReLu' -> neuralNetworkAiReLu(Board, Move, Player);
         writeln("Incorrect AI type"), fail
     ),
 
     playMove(Board,Move,NewBoard,Player), % Play the move and get the result in a new Board
 	applyIt(Board, NewBoard), % Remove the old board from the KB and store the new one
-    neuralNetworkAi(NewBoard, Move, Player),
     displayBoard(NewBoard), % print it
 	( gameOver(NewBoard, Move, Details) ->
                     displayBoard(NewBoard),
