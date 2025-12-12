@@ -2,31 +2,36 @@ include:
   - template: Jobs/SAST.gitlab-ci.yml
   - template: Jobs/Container-Scanning.gitlab-ci.yml
 
+workflow:
+  rules: # Run the pipeline only on any commit or on merge request
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: always
+    - if: '$CI_COMMIT_BRANCH'
+      when: always
+    - when: never
+
+
+default:
+  before_script:
+    - docker info
+
 build-prolog:
   stage: build
+  rules: # Run the job only on protected branches
+    - if: '$CI_COMMIT_REF_PROTECTED == "true"'
   before_script:
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY -u "$CI_REGISTRY_USER" --password-stdin
   script:
     - docker build --pull -t "$CI_REGISTRY_IMAGE/aliapr-prolog:latest" ./
     - docker push "$CI_REGISTRY_IMAGE/aliapr-prolog:latest"
-  services:
-    - docker:dind
-  variables:
-    DOCKER_HOST: tcp://docker:2375
-    DOCKER_DRIVER: overlay2
 
 test-prolog:
   stage: test
-  rules:
+  rules: # Run the job only on any commit or on merge request
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_COMMIT_BRANCH'
   before_script:
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY -u "$CI_REGISTRY_USER" --password-stdin
   script:
     - docker pull "$CI_REGISTRY_IMAGE/aliapr-prolog:latest"
-    - docker run --rm "$CI_REGISTRY_IMAGE/aliapr-prolog:latest" echo "Running tests for job 1"
-  services:
-    - docker:dind
-  variables:
-    DOCKER_HOST: tcp://docker:2375
-    DOCKER_DRIVER: overlay2
+    - docker run --rm "$CI_REGISTRY_IMAGE/aliapr-prolog:latest"
