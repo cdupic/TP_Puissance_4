@@ -82,6 +82,7 @@ play(Player):-
 
     playMove(Board,Move,NewBoard,Player), % Play the move and get the result in a new Board
 	applyIt(Board, NewBoard), % Remove the old board from the KB and store the new one
+    neuralNetworkAi(NewBoard, Move, Player),
     displayBoard(NewBoard), % print it
 	( gameOver(NewBoard, Move, Details) ->
                     displayBoard(NewBoard),

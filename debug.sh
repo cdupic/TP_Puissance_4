@@ -1,4 +1,4 @@
-export p1=basic
+export p1=random
 export p2=random
 swipl \
     -s src/game.pl \
@@ -8,4 +8,4 @@ swipl \
     -s src/ia/minmax.pl \
     -s src/ia/neural-network.pl \
     -s src/ia/random.pl \
-    -g "init, halt."
+    -g "trace, init, halt."
