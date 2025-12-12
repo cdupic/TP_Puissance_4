@@ -3,7 +3,17 @@
 services:
   aliapr-prolog:
     build: .
-    container_name: alia-pr
+    container_name: aliapr-prolog
     volumes:
       - ./src:/app/src
     command: sleep 99999999
+
+  aliapr-web:
+    build:
+      dockerfile: server.Dockerfile
+    container_name: aliapr-web
+    volumes:
+      - ./server:/app/server
+      - ./src:/app/src
+    ports:
+      - "3000:3000"
