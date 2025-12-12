@@ -1,0 +1,8 @@
+services:
+  aliapr-server:
+    image: gitlab.insa-lyon.fr:5050/cgrennerat/4ifs1-alia-pr/aliapr-prolog:latest
+    ports:
+      - "80:3000"
+    environment:
+      - PORT=3000
+      - NODE_ENV=production
