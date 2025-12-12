@@ -1,5 +1,6 @@
 include:
   - template: Jobs/SAST.gitlab-ci.yml
+  - template: Jobs/Container-Scanning.gitlab-ci.yml
 
 build-prolog:
   stage: build
