@@ -1,6 +1,12 @@
+image: docker:latest
+
 include:
   - template: Jobs/SAST.gitlab-ci.yml
   - template: Jobs/Container-Scanning.gitlab-ci.yml
+
+stages:
+  - build
+  - test
 
 workflow:
   rules: # Run the pipeline only on any commit or on merge request
@@ -10,6 +16,10 @@ workflow:
       when: always
     - when: never
 
+
+variables:
+  DOCKER_HOST: tcp://docker:2375
+  DOCKER_DRIVER: overlay2
 
 default:
   before_script:
@@ -24,6 +34,7 @@ build-prolog:
   script:
     - docker build --pull -t "$CI_REGISTRY_IMAGE/aliapr-prolog:latest" ./
     - docker push "$CI_REGISTRY_IMAGE/aliapr-prolog:latest"
+
 
 test-prolog:
   stage: test
