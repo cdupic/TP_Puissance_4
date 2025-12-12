@@ -1,0 +1,9 @@
+# Use this file to run the app in docker in dev mode
+
+services:
+  aliapr-prolog:
+    build: .
+    container_name: alia-pr
+    volumes:
+      - ./src:/app/src
+    command: sleep 99999999
