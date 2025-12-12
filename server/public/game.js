@@ -2,16 +2,30 @@
 class Connect4GameUI {
     constructor() {
         this.currentGame = null;
-        this.apiBase = 'http://localhost:3000';
+        this.apiBase = null; // Will be loaded from config
         this.replayInterval = null;
         this.currentReplayIndex = 0;
         this.pollInterval = null;
         this.init();
     }
 
-    init() {
+    async init() {
+        // Load API configuration
+        await this.loadConfig();
         this.bindEvents();
         this.createBoard();
+    }
+
+    async loadConfig() {
+        try {
+            const response = await fetch('/api/config');
+            const config = await response.json();
+            this.apiBase = config.apiBase;
+            console.log('API Base URL:', this.apiBase);
+        } catch (error) {
+            console.error('Failed to load config, using default:', error);
+            this.apiBase = window.location.origin;
+        }
     }
 
     bindEvents() {
