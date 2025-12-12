@@ -9,6 +9,7 @@
 displayBoard(Board) :-
     displayMode("heavy") -> displayBoardHeavy(Board) ;
     displayMode("light") -> displayBoardLight(Board) ;
+    displayMode("ascii-light") -> displayBoardAsciiLight(Board) ;
     displayBoardAscii(Board).
 
 
@@ -33,8 +34,14 @@ displayBoardAscii(Board) :-
     ((X > 0, X < 41, (X+1) mod 7 =:= 0) -> writeln('|'), write('| ') ; true ),
     X == 41, writeln('|'), writeln('+----------------------+').
 
+displayBoardAsciiLight(Board) :-
+    between(0, 41, X),
+    nth0(X, Board, Player), playerSymbol(Player, Symbol), format("~w", [Symbol]),
+    ((X > 0, X < 41, (X+1) mod 7 =:= 0) -> writeln('') ; true ),
+    X == 41, writeln('').
+
 playerSymbol(Player, Symbol):-
-    displayMode("ascii") -> (Player == 'X' -> Symbol = 'X ' ; Player == 'Y' -> Symbol = 'O ' ; Symbol = '. ') ;
+    (displayMode("ascii") ; displayMode("ascii-light")) -> (Player == 'X' -> Symbol = 'X ' ; Player == 'Y' -> Symbol = 'O ' ; Symbol = '. ') ;
     (Player == 'X' -> Symbol = '🟡' ; Player == 'Y' -> Symbol = '🔴' ; Symbol = '  ').
 
 changePlayer('X','Y').
@@ -62,7 +69,7 @@ isWinningMove(Board, Move) :-
     diagonalcompleted(Board, Move).
 
 
-play(Player):- 
+play(Player):-
     board(Board), % instanciate the board from the knowledge base
     playerSymbol(Player, Symbol), write('New turn for: '), writeln(Symbol),
 

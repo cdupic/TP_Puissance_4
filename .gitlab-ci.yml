@@ -1,0 +1,62 @@
+image: docker:latest
+
+stages:
+  - build
+  - test
+
+variables:
+  DOCKER_HOST: tcp://docker:2375
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: ""
+
+build-prolog:
+  stage: build
+  rules: # Run the job only on protected branches
+    - if: '$CI_COMMIT_REF_PROTECTED == "true"'
+    - if: '$CI_COMMIT_BRANCH'
+  before_script:
+    - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY -u "$CI_REGISTRY_USER" --password-stdin
+  script:
+    - docker build --pull -t "$CI_REGISTRY_IMAGE/aliapr-prolog:latest" -f Dockerfile ./
+    - docker push "$CI_REGISTRY_IMAGE/aliapr-prolog:latest"
+  services:
+    - docker:dind
+
+build-server:
+  stage: build
+  rules: # Run the job only on protected branches
+    - if: '$CI_COMMIT_REF_PROTECTED == "true"'
+    - if: '$CI_COMMIT_BRANCH'
+  before_script:
+    - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY -u "$CI_REGISTRY_USER" --password-stdin
+  script:
+    - docker build --pull -t "$CI_REGISTRY_IMAGE/aliapr-server:latest" -f server.Dockerfile ./
+    - docker push "$CI_REGISTRY_IMAGE/aliapr-server:latest"
+  services:
+    - docker:dind
+
+test-prolog:
+  stage: test
+  rules: # Run the job only on any commit or on merge request
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH'
+  before_script:
+    - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY -u "$CI_REGISTRY_USER" --password-stdin
+  script:
+    - docker build --pull -t "$CI_REGISTRY_IMAGE/aliapr-prolog:latest" -f Dockerfile ./
+    - docker run "$CI_REGISTRY_IMAGE/aliapr-prolog:latest" make test
+  services:
+    - docker:dind
+
+test-server:
+  stage: test
+  rules: # Run the job only on any commit or on merge request
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH'
+  before_script:
+    - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY -u "$CI_REGISTRY_USER" --password-stdin
+  script:
+    - docker build --pull -t "$CI_REGISTRY_IMAGE/aliapr-server:latest" -f server.Dockerfile ./
+    - echo "✅ Server image built successfully"
+  services:
+    - docker:dind
