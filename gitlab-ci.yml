@@ -1,4 +1,4 @@
-build-job:
+build-prolog:
   stage: build
   before_script:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
@@ -11,7 +11,15 @@ build-job:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_DRIVER: overlay2
 
-test-job1:
+test-prolog:
   stage: test
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
   script:
-    - echo "This job tests something"
+    - docker pull "$CI_REGISTRY_IMAGE/aliapr-prolog:latest"
+    - docker run --rm "$CI_REGISTRY_IMAGE/aliapr-prolog:latest" echo "Running tests for job 1"
+  services:
+    - docker:dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_DRIVER: overlay2
