@@ -124,17 +124,17 @@ diagonalcompleted(Board, Move) :-
     topLeftDiagonal(Board, Move);
     topRightDiagonal(Board, Move).
 
-%gameOver(Board, Move) :-   % first check if board is full
-%    write("Draw\n"),
-%    between(0, 41, X),
-%    nth0(X, Board, Val),
-%    nonvar(Val).
-
 
 gameOver(Board, Move, Details):-
     linecompleted(Board, Move) -> Details = "Line completed";
     columncompleted(Board, Move) -> Details = "Column completed";
-    diagonalcompleted(Board, Move) -> Details = "Diagonal completed".
+    diagonalcompleted(Board, Move) -> Details = "Diagonal completed"
+    ;
+
+    % else check whether board is full
+    \+ (between(0, 41, X),
+        nth0(X, Board, Val),
+        var(Val)) -> write("Draw\n").
 
 incr:-
     retract(game_number(N)),
