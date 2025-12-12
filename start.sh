@@ -1,11 +1,16 @@
 export p1=basic
 export p2=random
-swipl \
-    -s src/game.pl \
-    -s src/gameover.pl \
-    -s src/bootstrap.pl \
-    -s src/ia/basic.pl \
-    -s src/ia/minmax.pl \
-    -s src/ia/neural-network.pl \
-    -s src/ia/random.pl \
+
+cd src/Neural-Network
+
+swipl  \
+    -s ./../game.pl \
+    -s ./../gameover.pl \
+    -s ./../bootstrap.pl \
+    -s ./../ia/basic.pl \
+    -s ./../ia/minmax.pl \
+    -s ./../ia/neural-network-sigmoid.pl \
+    -s ./../ia/neural-network-ReLu.pl \
+    -s ./../ia/user.pl \
+    -s ./../ia/random.pl \
     -g "init, halt."
