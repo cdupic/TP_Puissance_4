@@ -9,6 +9,7 @@
 displayBoard(Board) :-
     displayMode("heavy") -> displayBoardHeavy(Board) ;
     displayMode("light") -> displayBoardLight(Board) ;
+    displayMode("ascii-light") -> displayBoardAsciiLight(Board) ;
     displayBoardAscii(Board).
 
 
@@ -33,8 +34,14 @@ displayBoardAscii(Board) :-
     ((X > 0, X < 41, (X+1) mod 7 =:= 0) -> writeln('|'), write('| ') ; true ),
     X == 41, writeln('|'), writeln('+----------------------+').
 
+displayBoardAsciiLight(Board) :-
+    between(0, 41, X),
+    nth0(X, Board, Player), playerSymbol(Player, Symbol), format("~w", [Symbol]),
+    ((X > 0, X < 41, (X+1) mod 7 =:= 0) -> writeln('') ; true ),
+    X == 41, writeln('').
+
 playerSymbol(Player, Symbol):-
-    displayMode("ascii") -> (Player == 'X' -> Symbol = 'X ' ; Player == 'Y' -> Symbol = 'O ' ; Symbol = '. ') ;
+    (displayMode("ascii") ; displayMode("ascii-light")) -> (Player == 'X' -> Symbol = 'X ' ; Player == 'Y' -> Symbol = 'O ' ; Symbol = '. ') ;
     (Player == 'X' -> Symbol = '🟡' ; Player == 'Y' -> Symbol = '🔴' ; Symbol = '  ').
 
 changePlayer('X','Y').
@@ -42,27 +49,48 @@ changePlayer('Y','X').
 
 dropPiece(Board, Column, Move) :-
     between(0, 6, Row),
-    Move is 35 + Column - 7*Row,
-    nth0(Move, Board, Val),
-    var(Val).
+        Move is 35 + Column - 7*Row,
+        nth0(Move, Board, Val),
+        var(Val),
+    !.
 
 playMove(Board,Move,NewBoard,Player) :-
-		copy_term(Board, NewBoard),
-    	nth0(Move, NewBoard,Player).
+	copy_term(Board, NewBoard),
+    nth0(Move, NewBoard,Player).
 
 applyIt(Board, NewBoard) :-
     retract(board(Board)), % on oublie l'ancienne règle qui n'est plus vraie
     assert(board(NewBoard)).
 
 
+isWinningMove(Board, Move) :-
+    linecompleted(Board, Move);
+    columncompleted(Board, Move);
+    diagonalcompleted(Board, Move).
+
+
 play(Player):-
-    		board(Board), % instanciate the board from the knowledge base
-       	    displayBoard(Board), % print it
-       	    playerSymbol(Player, Symbol), write('New turn for: '), writeln(Symbol),
-            ia(Board, Move, Player), % ask the AI for a move, that is, an index for the Player
-    	    playMove(Board,Move,NewBoard,Player), % Play the move and get the result in a new Board
-		    applyIt(Board, NewBoard), % Remove the old board from the KB and store the new one
-		    ( gameOver(NewBoard, Move, Details) ->
+    board(Board), % instanciate the board from the knowledge base
+    playerSymbol(Player, Symbol), write('New turn for: '), writeln(Symbol),
+
+    % select the correct predicate (given in flags) to call for the current player
+    (
+        Player == 'X' -> getenv("p1", AiType);
+        Player == 'Y' -> getenv("p2", AiType)
+    ),
+
+    (
+        AiType == 'basic' -> basicAi(Board, Move, Player);
+        AiType == 'minmax' -> minmaxIa(Board, Move, Player);
+        AiType == 'random' -> randomIa(Board, Move, Player);
+        AiType == 'user' -> userAi(Board, Move, Player);
+        writeln("Incorrect AI type"), fail
+    ),
+
+    playMove(Board,Move,NewBoard,Player), % Play the move and get the result in a new Board
+	applyIt(Board, NewBoard), % Remove the old board from the KB and store the new one
+    displayBoard(NewBoard), % print it
+	( gameOver(NewBoard, Move, Details) ->
                     displayBoard(NewBoard),
                     format("Game over ! (~w)\n", [Details]), !
                 ;
@@ -74,3 +102,10 @@ init :-
     length(Board, 42),
     assert(board(Board)),
     play('X').
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%% IA %%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+

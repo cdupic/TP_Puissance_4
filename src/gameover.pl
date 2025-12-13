@@ -136,6 +136,8 @@ gameOver(Board, Move, Details):-
         nth0(X, Board, Val),
         var(Val)) -> write("Draw\n").
 
+
+
 incr:-
     retract(game_number(N)),
     N1 is N + 1,
