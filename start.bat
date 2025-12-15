@@ -1,4 +1,4 @@
-set p1=neural-network-sigmoid
+set p1=basic
 set p2=neural-network-ReLu
 cd src\Neural-Network
 
