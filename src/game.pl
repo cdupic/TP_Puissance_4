@@ -86,6 +86,7 @@ play(Player):-
         AiType == 'user' -> userAi(Board, Move, Player);
         AiType == 'neural-network-sigmoid' -> neuralNetworkAiSigmoid(Board, Move, Player);
         AiType == 'neural-network-ReLu' -> neuralNetworkAiReLu(Board, Move, Player);
+        AiType == 'neural-network-draw' -> neuralNetworkAiDraw(Board, Move, Player);
         writeln("Incorrect AI type"), fail
     ),
 
