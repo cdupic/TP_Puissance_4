@@ -14,7 +14,7 @@ userAi(Board, Move, _) :-
         writeln("Enter a valid move (0-6) :"),
         read(UserColumn),
         validInput(UserColumn),
-        dropPiece(Board, UserColumn, UserMove),
+        dropPiece(Board, UserColumn, _),
     !,
     dropPiece(Board, UserColumn, Move).
 
