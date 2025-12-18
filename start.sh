@@ -14,3 +14,5 @@ swipl  \
     -s ./../ia/user.pl \
     -s ./../ia/random.pl \
     -g "init, halt."
+
+cd ../../
