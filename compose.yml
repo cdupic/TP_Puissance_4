@@ -1,8 +1,20 @@
 services:
   aliapr-server:
-    image: gitlab.insa-lyon.fr:5050/cgrennerat/4ifs1-alia-pr/aliapr-prolog:latest
-    ports:
-      - "80:3000"
+    image: gitlab.insa-lyon.fr:5050/cgrennerat/4ifs1-alia-pr/aliapr-server:latest
+    container_name: aliapr-server
+    labels:
+      traefik.enable: true
+      traefik.host: aliapr.clgr.io
+      traefik.http.services.aliapr.loadbalancer.server.port: 3000
+    networks:
+      - traefik
     environment:
       - PORT=3000
       - NODE_ENV=production
+      - API_BASE_URL=https://aliapr.clgr.io
+    restart: 'unless-stopped'
+
+networks:
+  traefik:
+    external: true
+    name: traefik

@@ -8,6 +8,12 @@ const app = express();
 app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
+// Configuration endpoint for frontend
+app.get('/api/config', (req, res) => {
+    res.json({
+        apiBase: process.env.API_BASE_URL || 'http://localhost:3000'
+    });
+});
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
@@ -47,8 +53,8 @@ class Connect4Game {
         // Set environment variables for AI types
         const env = {
             ...process.env,
-            p1: this.player1 === 'human' ? 'basic' : this.player1,
-            p2: this.player2 === 'human' ? 'basic' : this.player2
+            p1: this.player1,
+            p2: this.player2
         };
 
         // Start Prolog game
@@ -228,7 +234,6 @@ class Connect4Game {
 }
 
 // API Routes
-
 // Start a new game
 app.post('/api/games', (req, res) => {
     const { player1 = 'basic', player2 = 'basic' } = req.body;
