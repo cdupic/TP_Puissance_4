@@ -22,7 +22,7 @@ formatBoardForNN(Board, Player, Str) :-
 neuralNetworkAiSigmoid(Board, Move, Player) :-
     formatBoardForNN(Board, Player, Str),
     %writeln(Str),
-    format(string(Command), "C:\\Users\\aurel\\Desktop\\Cours\\4A\\ALIA\\TP_Puissance_4\\src\\Neural-Network\\move_calculation-sigmoid.exe ~w nn_states\\sigmoid\\NeuralNetworkDumpFile_l4_i84_128_128_128_3_e1550_mitigated_labels.nn", [Str]),
+    format(string(Command), ".\\move_calculation-sigmoid.exe ~w nn_states\\sigmoid\\NeuralNetworkDumpFile_l4_i84_128_128_128_3_e1550_mitigated_labels.nn", [Str]),
     %writeln(Command),
     shell(Command, Column),
     %writeln(Column),

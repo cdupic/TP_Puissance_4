@@ -1,5 +1,6 @@
 set p1=basic
-set p2=neural-network-draw
+set p2=neural-network-ReLu
+
 cd src\Neural-Network
 
 swipl  ^
@@ -10,7 +11,6 @@ swipl  ^
     -s .\..\ia\minmax.pl ^
     -s .\..\ia\neural-network-sigmoid.pl ^
     -s .\..\ia\neural-network-ReLu.pl ^
-    -s .\..\ia\neural-network-draw.pl ^
     -s .\..\ia\user.pl ^
     -s .\..\ia\random.pl ^
     -g "init, halt."
