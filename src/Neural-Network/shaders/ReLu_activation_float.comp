@@ -1,0 +1,32 @@
+#version 460 core
+
+layout(local_size_x = 1) in;
+
+const uint vectorSize = %VS%;
+const uint sampleSize = %SS%;
+
+layout(std430, binding = 0) buffer InputMat {
+    float input_mat[vectorSize][sampleSize];
+};
+
+layout(std430, binding = 1) buffer Output {
+    float output_mat[vectorSize][sampleSize];
+};
+
+
+
+float ReLu(float x) {
+    if (x>0) {
+        return x;
+    }
+    else {
+        return 0.f;
+    }
+}
+
+void main() {
+    uint sampleId = gl_GlobalInvocationID.x;
+    uint neuron = gl_GlobalInvocationID.y;
+
+    output_mat[neuron][sampleId] = ReLu(input_mat[neuron][sampleId]);
+}

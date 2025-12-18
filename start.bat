@@ -1,3 +1,18 @@
-set p1=user
-set p2=random
-swipl -s src/game.pl -s src/gameover.pl -s src/bootstrap.pl -s src/ia/basic.pl -s src/ia/minmax.pl -s src/ia/random.pl -s src/ia/user.pl -g "init, halt."
+set p1=basic
+set p2=neural-network-draw
+cd src\Neural-Network
+
+swipl  ^
+    -s .\..\game.pl ^
+    -s .\..\gameover.pl ^
+    -s .\..\bootstrap.pl ^
+    -s .\..\ia\basic.pl ^
+    -s .\..\ia\minmax.pl ^
+    -s .\..\ia\neural-network-sigmoid.pl ^
+    -s .\..\ia\neural-network-ReLu.pl ^
+    -s .\..\ia\neural-network-draw.pl ^
+    -s .\..\ia\user.pl ^
+    -s .\..\ia\random.pl ^
+    -g "init, halt."
+
+cd ..\..\

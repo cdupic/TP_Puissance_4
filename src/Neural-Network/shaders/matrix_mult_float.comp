@@ -1,0 +1,31 @@
+#version 460 core
+
+layout(local_size_x = 1) in;
+
+const uint height_left = %HL%;
+const uint width_right = %WR%;
+const uint common_length = %CL%;
+
+layout(std430, binding = 0) buffer Input1 {
+    float mat_1[height_left][common_length];
+};
+
+layout(std430, binding = 1) buffer Input2 {
+    float mat_2[common_length][width_right];
+};
+
+layout(std430, binding = 2) buffer Output {
+    float mat_out[height_left][width_right];
+};
+
+
+void main() {
+    uint idx = gl_GlobalInvocationID.x;
+    uint idy = gl_GlobalInvocationID.y;
+
+    float sum = 0.0;
+    for (uint i = 0u; i < common_length; ++i){
+        sum += mat_1[idx][i] * mat_2[i][idy];
+    }
+    mat_out[idx][idy] = sum;
+}

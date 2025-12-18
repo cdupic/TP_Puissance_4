@@ -1,3 +1,12 @@
-set p1=user
-set p2=random
-swipl -s src/game.pl -s src/gameover.pl -s src/bootstrap.pl -s src/ia/basic.pl -s src/ia/minmax.pl -s src/ia/random.pl -s src/ia/user.pl -g "trace, init, halt."
+set p1=neural-network
+set p2=user
+swipl  ^
+    -s src/game.pl ^
+    -s src/gameover.pl ^
+    -s src/bootstrap.pl ^
+    -s src/ia/basic.pl ^
+    -s src/ia/minmax.pl ^
+    -s src/ia/neural-network.pl ^
+    -s src/ia/user.pl ^
+    -s src/ia/random.pl ^
+    -g "trace, init, halt."
