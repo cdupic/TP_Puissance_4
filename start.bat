@@ -1,5 +1,5 @@
 set p1=basic
-set p2=neural-network-ReLu
+set p2=minmax
 
 cd src\Neural-Network
 
